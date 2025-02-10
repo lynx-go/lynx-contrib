@@ -10,7 +10,7 @@ func Handle[IN any, OUT any](handler func(ctx context.Context, in IN) (OUT, erro
 	return func(c *gin.Context) {
 		var errorRenderFn = DefaultErrorRenderFunc()
 		var in IN
-		if err := c.BindJSON(in); err != nil {
+		if err := c.ShouldBind(in); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, errorRenderFn(err))
 			return
 		}
