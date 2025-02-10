@@ -2,6 +2,7 @@ package binding
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -17,7 +18,16 @@ func Handle[IN any, OUT any](handler func(ctx context.Context, in IN) (OUT, erro
 
 		out, err := handler(c, in)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorRenderFn(err))
+			switch e := err.(type) {
+			case *Error:
+				if e.Status != nil {
+					c.AbortWithStatusJSON(*e.Status, errorRenderFn(err))
+				} else {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, errorRenderFn(err))
+				}
+			default:
+				c.AbortWithStatusJSON(http.StatusInternalServerError, errorRenderFn(err))
+			}
 		}
 		c.JSON(http.StatusOK, out)
 	}
@@ -39,4 +49,15 @@ func SetDefaultErrorRenderer(f ErrorRenderFunc) {
 
 func DefaultErrorRenderFunc() ErrorRenderFunc {
 	return defaultErrorRender
+}
+
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Reason  string `json:"reason"`
+	Status  *int   `json:"status"`
+}
+
+func (e *Error) Error() string {
+	return fmt.Sprintf("[Error %d] %s - %s", e.Code, e.Reason, e.Message)
 }
