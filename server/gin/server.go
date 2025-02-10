@@ -2,6 +2,7 @@ package gin
 
 import (
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/lynx-go/lynx"
 	"log/slog"
@@ -26,6 +27,9 @@ func (s *Server) Start(ctx context.Context) error {
 	go func() {
 		if err := s.srv.ListenAndServe(); err != nil {
 			slog.Error("start gin server failed", "error", err)
+			if errors.Is(err, http.ErrServerClosed) {
+				return
+			}
 			if s.o.PanicOnError {
 				panic(err)
 			}
