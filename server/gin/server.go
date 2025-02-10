@@ -26,6 +26,9 @@ func (s *Server) Start(ctx context.Context) error {
 	go func() {
 		if err := s.srv.ListenAndServe(); err != nil {
 			slog.Error("start gin server failed", "error", err)
+			if s.o.PanicOnError {
+				panic(err)
+			}
 		}
 	}()
 
