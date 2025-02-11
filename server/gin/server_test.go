@@ -17,12 +17,12 @@ func TestServer_Start(t *testing.T) {
 		})
 	})
 	ctx := context.TODO()
-	if err := s.Start(ctx); err != nil {
+	if err := s.OnStart(ctx); err != nil {
 		t.Fatal(err)
 	}
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	<-sig
-	s.Stop(ctx)
+	s.OnStop(ctx)
 	time.Sleep(1 * time.Second)
 }
