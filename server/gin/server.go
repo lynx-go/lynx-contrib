@@ -20,7 +20,10 @@ type Server struct {
 }
 
 func (s *Server) OnStart(ctx context.Context) error {
-	return s.srv.ListenAndServe()
+	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+	return nil
 }
 
 func (s *Server) OnStop(ctx context.Context) {
