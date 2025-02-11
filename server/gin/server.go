@@ -2,6 +2,7 @@ package gin
 
 import (
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/lynx-go/lynx"
 	"github.com/lynx-go/lynx/hook"
@@ -20,7 +21,7 @@ type Server struct {
 }
 
 func (s *Server) OnStart(ctx context.Context) error {
-	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 	return nil
