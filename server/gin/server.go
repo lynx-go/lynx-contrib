@@ -2,10 +2,9 @@ package gin
 
 import (
 	"context"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/lynx-go/lynx"
-	"log/slog"
+	"github.com/lynx-go/lynx/hook"
 	"net/http"
 )
 
@@ -15,32 +14,25 @@ type Option struct {
 }
 
 type Server struct {
+	*hook.HookBase
 	o   Option
 	srv *http.Server
 }
 
+func (s *Server) OnStart(ctx context.Context) error {
+	return s.srv.ListenAndServe()
+}
+
+func (s *Server) OnStop(ctx context.Context) {
+	_ = s.srv.Shutdown(ctx)
+}
+
+func (s *Server) IgnoreForCLI() bool {
+	return false
+}
+
 func (s *Server) Name() string {
 	return "gin"
-}
-
-func (s *Server) Start(ctx context.Context) error {
-	go func() {
-		if err := s.srv.ListenAndServe(); err != nil {
-			slog.Error("start gin server failed", "error", err)
-			if errors.Is(err, http.ErrServerClosed) {
-				return
-			}
-			if s.o.PanicOnError {
-				panic(err)
-			}
-		}
-	}()
-
-	return nil
-}
-
-func (s *Server) Stop(ctx context.Context) error {
-	return s.srv.Shutdown(ctx)
 }
 
 var _ lynx.Server = new(Server)

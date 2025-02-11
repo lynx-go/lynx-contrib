@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 	"github.com/lynx-go/lynx"
-	"log/slog"
+	"github.com/lynx-go/lynx/hook"
 	"net/http"
 )
 
@@ -18,26 +18,20 @@ type Server struct {
 	addr    string
 	handler http.Handler
 	server  *http.Server
+	*hook.HookBase
+}
+
+func (s *Server) OnStart(ctx context.Context) error {
+	s.server = &http.Server{Addr: s.addr, Handler: s.handler}
+	return s.server.ListenAndServe()
+}
+
+func (s *Server) OnStop(ctx context.Context) {
+	_ = s.server.Shutdown(ctx)
 }
 
 func (s *Server) Name() string {
 	return "http"
-}
-
-func (s *Server) Start(ctx context.Context) error {
-	logger := slog.Default()
-	go func() {
-		s.server = &http.Server{Addr: s.addr, Handler: s.handler}
-		logger.Info("http server starting", "addr", s.addr)
-		if err := s.server.ListenAndServe(); err != nil {
-			logger.Error("start http server failed", "error", err)
-		}
-	}()
-	return nil
-}
-
-func (s *Server) Stop(ctx context.Context) error {
-	return s.server.Close()
 }
 
 var _ lynx.Server = new(Server)
