@@ -2,8 +2,7 @@ package http
 
 import (
 	"context"
-	"github.com/lynx-go/lynx"
-	"github.com/lynx-go/lynx/hook"
+	"github.com/lynx-go/lynx/lifecycle"
 	"net/http"
 )
 
@@ -18,15 +17,18 @@ type Server struct {
 	addr    string
 	handler http.Handler
 	server  *http.Server
-	*hook.HookBase
 }
 
-func (s *Server) OnStart(ctx context.Context) error {
+func (s *Server) IgnoreCLI() bool {
+	return true
+}
+
+func (s *Server) Start(ctx context.Context) error {
 	s.server = &http.Server{Addr: s.addr, Handler: s.handler}
 	return s.server.ListenAndServe()
 }
 
-func (s *Server) OnStop(ctx context.Context) {
+func (s *Server) Stop(ctx context.Context) {
 	_ = s.server.Shutdown(ctx)
 }
 
@@ -34,4 +36,4 @@ func (s *Server) Name() string {
 	return "http"
 }
 
-var _ lynx.Server = new(Server)
+var _ lifecycle.Service = new(Server)
