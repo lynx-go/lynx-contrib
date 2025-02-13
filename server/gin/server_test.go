@@ -3,6 +3,7 @@ package gin
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,12 +18,13 @@ func TestServer_Start(t *testing.T) {
 		})
 	})
 	ctx := context.TODO()
-	if err := s.OnStart(ctx); err != nil {
+	if err := s.Start(ctx); err != nil {
 		t.Fatal(err)
 	}
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	<-sig
-	s.OnStop(ctx)
+	err := s.Stop(ctx)
+	require.NoError(t, err)
 	time.Sleep(1 * time.Second)
 }
