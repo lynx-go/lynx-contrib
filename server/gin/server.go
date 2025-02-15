@@ -35,9 +35,9 @@ func (s *Server) Name() string {
 
 var _ lynx.Hook = new(Server)
 
-type MountFunc func(r gin.IRoutes)
+type MountRoutes func(r *gin.Engine)
 
-func New(o Option, mount MountFunc) *Server {
+func New(o Option, mount MountRoutes) *Server {
 	router := gin.Default()
 	mount(router)
 	srv := &http.Server{
