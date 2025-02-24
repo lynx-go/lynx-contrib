@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/lynx-go/lynx"
+	"github.com/lynx-go/lynx/integration"
 	"net/http"
+	"sync"
 )
 
 type Option struct {
@@ -14,11 +15,24 @@ type Option struct {
 }
 
 type Server struct {
-	o   Option
-	srv *http.Server
+	o       Option
+	srv     *http.Server
+	started bool
+	mux     sync.Mutex
+}
+
+func (s *Server) Status() (int, error) {
+	if s.started {
+		return 200, nil
+	}
+	return 503, nil
 }
 
 func (s *Server) Start(ctx context.Context) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.started = true
 	if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
@@ -26,6 +40,7 @@ func (s *Server) Start(ctx context.Context) error {
 }
 
 func (s *Server) Stop(ctx context.Context) error {
+	s.started = false
 	return s.srv.Shutdown(ctx)
 }
 
@@ -33,7 +48,7 @@ func (s *Server) Name() string {
 	return "gin-server"
 }
 
-var _ lynx.Hook = new(Server)
+var _ integration.Integration = new(Server)
 
 type MountRoutes func(r *gin.Engine)
 
