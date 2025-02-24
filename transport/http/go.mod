@@ -1,4 +1,4 @@
-module github.com/lynx-go/lynx-contrib/server/http
+module github.com/lynx-go/lynx-contrib/transport/http
 
 go 1.23
 

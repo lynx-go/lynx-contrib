@@ -1,4 +1,4 @@
-module github.com/lynx-go/lynx-contrib/server/gin
+module github.com/lynx-go/lynx-contrib/transport/gin
 
 go 1.23
 
