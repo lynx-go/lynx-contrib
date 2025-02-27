@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/lynx-go/lynx/hook"
+	"github.com/lynx-go/x/log"
 	"net/http"
 	"sync"
 )
@@ -61,6 +62,7 @@ func (s *Server) Start(ctx context.Context) error {
 	defer s.mux.Unlock()
 	s.started = true
 	s.server = &http.Server{Addr: s.addr, Handler: s.handler}
+	log.InfoContext(ctx, "http server starting", "addr", s.addr)
 	if err := s.server.ListenAndServe(); err != nil {
 		s.started = false
 		if !errors.Is(err, http.ErrServerClosed) {
