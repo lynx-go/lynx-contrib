@@ -12,7 +12,7 @@ import (
 )
 
 func TestServer_Start(t *testing.T) {
-	s := New(Option{Addr: ":8080"}, func(r gin.IRoutes) {
+	s := New(Option{Addr: ":8080"}, func(r *gin.Engine) {
 		r.Any("/hello", func(c *gin.Context) {
 			c.JSON(200, gin.H{"message": "hello world"})
 		})

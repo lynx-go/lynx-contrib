@@ -20,7 +20,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lynx-go/lynx v0.0.7 // indirect
+	github.com/lynx-go/lynx v0.0.8 // indirect
 	github.com/lynx-go/x v0.0.0-20250212100416-03b1f32836b1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

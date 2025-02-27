@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/lynx-go/lynx/integration"
+	"github.com/lynx-go/lynx/hook"
 	"net/http"
 	"sync"
 )
@@ -21,11 +21,11 @@ type Server struct {
 	mux     sync.Mutex
 }
 
-func (s *Server) Status() (int, error) {
+func (s *Server) Status() (hook.Status, error) {
 	if s.started {
-		return 200, nil
+		return hook.StatusStarted, nil
 	}
-	return 503, nil
+	return hook.StatusUnstart, nil
 }
 
 func (s *Server) Start(ctx context.Context) error {
@@ -48,7 +48,7 @@ func (s *Server) Name() string {
 	return "gin-server"
 }
 
-var _ integration.Integration = new(Server)
+var _ hook.Hook = new(Server)
 
 type MountRoutes func(r *gin.Engine)
 
